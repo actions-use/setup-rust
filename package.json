@@ -1,45 +1,46 @@
 {
-  "name": "nodejs-template",
+  "name": "setup-rust",
   "version": "0.0.0",
-  "description": "nodejs-template",
-  "main": "dist/index.js",
+  "description": "Install the Rust toolchain",
+  "type": "module",
   "scripts": {
-    "prepublish": "npm run build",
-    "dev": "tsc --watch",
-    "build": "npm run lint && npm run clean && tsc",
-    "lint": "eslint . --ext .js,.ts --fix",
+    "dev": "rslib build --watch",
+    "build": "npm run lint && npm run clean && rslib build",
+    "lint": "eslint . --fix",
     "clean": "rimraf lib",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nashaofu/nodejs-template.git"
+    "url": "git+https://github.com/actions-use/setup-rust.git"
   },
   "keywords": [
-    "nodejs-template"
+    "setup-rust"
   ],
   "author": "nashaofu",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/nashaofu/nodejs-template/issues"
+    "url": "https://github.com/actions-use/setup-rust/issues"
   },
-  "homepage": "https://github.com/nashaofu/nodejs-template#readme",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
-  "dependencies": {},
+  "homepage": "https://github.com/actions-use/setup-rust#readme",
   "devDependencies": {
-    "@commitlint/cli": "^18.6.1",
-    "@commitlint/config-conventional": "^18.6.2",
-    "@typescript-eslint/eslint-plugin": "^7.1.0",
-    "@typescript-eslint/parser": "^7.1.0",
-    "eslint": "^8.57.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-airbnb-typescript": "^17.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.2",
-    "rimraf": "^5.0.5",
-    "typescript": "^5.3.3"
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "@eslint/js": "^9.23.0",
+    "@rslib/core": "^0.6.1",
+    "eslint": "^9.23.0",
+    "eslint-plugin-import": "^2.31.0",
+    "globals": "^16.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.29.0"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/io": "^1.1.3",
+    "@actions/tool-cache": "^2.0.2"
   }
 }

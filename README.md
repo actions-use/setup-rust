@@ -1,11 +1,24 @@
-# nodejs-template
+# setup-rust
 
-nodejs template
+Install the Rust toolchain
 
-## 模板功能
+## Example workflow
 
-- typescript 支持
-- eslint 规则`eslint-config-airbnb-base`、`eslint-config-airbnb-typescript/base`
-- husky git-hooks 支持
-- lint-staged 在提交代码时执行 eslint
-- commitlint 语义化提交 message
+```yaml
+name: Test
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: cargo test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: actions-use/setup-rust@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - run: rustup --version
+      - run: cargo --version
+```

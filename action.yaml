@@ -1,0 +1,29 @@
+name: "Setup Rust"
+description: "Install the Rust toolchain"
+author: nashaofu
+
+# Add your action's branding here. This will appear on the GitHub Marketplace.
+branding:
+  icon: heart
+  color: red
+
+# Define your inputs here.
+inputs:
+  toolchain:
+    description: Rust toolchain specification -- see https://rust-lang.github.io/rustup/concepts/toolchains.html#toolchain-specification
+    required: true
+  targets:
+    description: Comma-separated list of target triples to install for this toolchain (e.g., "wasm32-unknown-unknown,x86_64-unknown-linux-gnu")
+    required: false
+  components:
+    description: Comma-separated list of components to be additionally installed (e.g., "rustfmt,clippy")
+    required: false
+
+# Define your outputs here.
+outputs:
+  cachekey:
+    description: A short hash of the rustc version, appropriate for use as a cache key. "202503154eb161250e34"
+
+runs:
+  using: node20
+  main: dist/index.cjs
