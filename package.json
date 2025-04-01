@@ -1,0 +1,45 @@
+{
+  "name": "nodejs-template",
+  "version": "0.0.0",
+  "description": "nodejs-template",
+  "main": "dist/index.js",
+  "scripts": {
+    "prepublish": "npm run build",
+    "dev": "tsc --watch",
+    "build": "npm run lint && npm run clean && tsc",
+    "lint": "eslint . --ext .js,.ts --fix",
+    "clean": "rimraf lib",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nashaofu/nodejs-template.git"
+  },
+  "keywords": [
+    "nodejs-template"
+  ],
+  "author": "nashaofu",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/nashaofu/nodejs-template/issues"
+  },
+  "homepage": "https://github.com/nashaofu/nodejs-template#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@commitlint/cli": "^18.6.1",
+    "@commitlint/config-conventional": "^18.6.2",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  }
+}
