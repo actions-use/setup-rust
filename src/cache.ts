@@ -1,6 +1,6 @@
 import * as exec from "@actions/exec";
 
-export async function getCacheKey(toolchain: string) {
+export async function generateCacheKey(toolchain: string) {
   const output = await exec.getExecOutput("rustc", [
     `+${toolchain}`,
     "--version",

@@ -18144,16 +18144,76 @@ function __webpack_require__(moduleId) {
 var __webpack_exports__ = {};
 (()=>{
     "use strict";
-    var external_path_ = __webpack_require__("path");
-    var external_path_default = /*#__PURE__*/ __webpack_require__.n(external_path_);
-    var external_os_ = __webpack_require__("os");
-    var external_os_default = /*#__PURE__*/ __webpack_require__.n(external_os_);
     var core = __webpack_require__("./node_modules/.pnpm/@actions+core@1.11.1/node_modules/@actions/core/lib/core.js");
     const promises_namespaceObject = require("fs/promises");
     var promises_default = /*#__PURE__*/ __webpack_require__.n(promises_namespaceObject);
+    var external_os_ = __webpack_require__("os");
+    var external_os_default = /*#__PURE__*/ __webpack_require__.n(external_os_);
+    var external_path_ = __webpack_require__("path");
+    var external_path_default = /*#__PURE__*/ __webpack_require__.n(external_path_);
     var exec = __webpack_require__("./node_modules/.pnpm/@actions+exec@1.1.1/node_modules/@actions/exec/lib/exec.js");
     var io = __webpack_require__("./node_modules/.pnpm/@actions+io@1.1.3/node_modules/@actions/io/lib/io.js");
     var tool_cache = __webpack_require__("./node_modules/.pnpm/@actions+tool-cache@2.0.2/node_modules/@actions/tool-cache/lib/tool-cache.js");
+    const CARGO_HOME = process.env.CARGO_HOME ?? external_path_default().join(external_os_default().homedir(), ".cargo");
+    async function installRustup() {
+        const rustupPath = await io.which("rustup", false);
+        if (rustupPath) {
+            core.info("Rustup is already installed. Skipping installation.");
+            return;
+        }
+        core.info("Rustup is not installed. Proceeding with installation...");
+        const url = "win32" === external_os_default().platform() ? "https://win.rustup.rs" : "https://sh.rustup.rs";
+        const dest = external_path_default().join(external_os_default().tmpdir(), "rustup-init");
+        core.info(`Removing any existing rustup-init script at ${dest}`);
+        await io.rmRF(dest);
+        core.info(`Downloading rustup installation script from ${url}`);
+        const instalScript = await tool_cache.downloadTool(url, dest);
+        core.info(`Downloaded installation script to ${instalScript}`);
+        core.info("Setting execute permissions on the installation script...");
+        await promises_default().chmod(instalScript, 493);
+        core.info("Running rustup installation script...");
+        await exec.exec(instalScript, [
+            "--default-toolchain",
+            "none",
+            "-y"
+        ]);
+        core.info("Adding rustup to PATH...");
+        core.addPath(external_path_default().join(CARGO_HOME, "bin"));
+        core.info("Rustup installation completed successfully.");
+    }
+    async function installToolchain(toolchain, targets, components) {
+        core.info(`Starting installation of toolchain: ${toolchain}`);
+        const args = [
+            "toolchain",
+            "install",
+            toolchain,
+            "--profile",
+            "minimal"
+        ];
+        core.info("Adding specified targets to the installation arguments...");
+        targets.forEach((target)=>{
+            core.info(`Adding target: ${target}`);
+            args.push("--target", target);
+        });
+        core.info("Adding specified components to the installation arguments...");
+        components.forEach((component)=>{
+            core.info(`Adding component: ${component}`);
+            args.push("--component", component);
+        });
+        if ("nightly" === toolchain && components.length > 0) {
+            core.info("Toolchain is nightly. Allowing downgrade for components...");
+            args.push("--allow-downgrade");
+        }
+        args.push("--no-self-update");
+        core.info("Executing rustup toolchain installation...");
+        await exec.exec("rustup", args);
+        core.info(`Setting default toolchain to: ${toolchain}`);
+        await exec.exec("rustup", [
+            "default",
+            toolchain
+        ]);
+        core.info("Toolchain installation completed successfully.");
+    }
     function getToolchain() {
         const toolchain = core.getInput("toolchain", {
             required: true
@@ -18172,53 +18232,7 @@ var __webpack_exports__ = {};
         }) || "";
         return components.split(",").map((target)=>target.trim()).filter(Boolean);
     }
-    async function installRustup() {
-        const rustupPath = await io.which("rustup", false);
-        if (rustupPath) {
-            core.info("rustup already install");
-            return;
-        }
-        core.info("rustup does not exist");
-        const url = "win32" === external_os_default().platform() ? "https://win.rustup.rs" : "https://sh.rustup.rs";
-        const instalScript = await tool_cache.downloadTool(url, external_path_default().join(external_os_default().tmpdir(), "rustup-init"));
-        core.info(`Downloaded installation script to ${instalScript}`);
-        await promises_default().chmod(instalScript, 493);
-        await exec.exec(instalScript, [
-            "--default-toolchain",
-            "none",
-            "-y"
-        ]);
-        core.addPath(external_path_default().join(CARGO_HOME, "bin"));
-        core.info("Installed rustup");
-    }
-    async function installToolchain() {
-        const toolchain = getToolchain();
-        const targets = getTargets();
-        const components = getComponents();
-        core.info("Installing toolchain with rustup");
-        const args = [
-            "toolchain",
-            "install",
-            toolchain,
-            "--profile",
-            "minimal"
-        ];
-        targets.forEach((target)=>{
-            args.push("--target", target);
-        });
-        components.forEach((component)=>{
-            args.push("--component", component);
-        });
-        if ("nightly" === toolchain && components.length > 0) args.push("--allow-downgrade");
-        args.push("--no-self-update");
-        await exec.exec("rustup", args);
-        await exec.exec("rustup", [
-            "default",
-            toolchain
-        ]);
-        core.info("Logging installed toolchain");
-    }
-    async function getCacheKey(toolchain) {
+    async function generateCacheKey(toolchain) {
         const output = await exec.getExecOutput("rustc", [
             `+${toolchain}`,
             "--version",
@@ -18234,17 +18248,28 @@ var __webpack_exports__ = {};
         });
         return (date + hash).replaceAll("-", "").slice(0, 20);
     }
-    const CARGO_HOME = process.env.CARGO_HOME ?? external_path_default().join(external_os_default().homedir(), ".cargo");
     async function run() {
-        core.info("Setting cargo environment variables");
-        core.exportVariable("CARGO_INCREMENTAL", "0");
-        core.exportVariable("CARGO_TERM_COLOR", "always");
         try {
+            core.info("Initializing setup-rust action...");
+            core.info("Setting cargo environment variables");
+            core.exportVariable("CARGO_INCREMENTAL", "0");
+            core.exportVariable("CARGO_TERM_COLOR", "always");
+            const toolchain = getToolchain();
+            const targets = getTargets();
+            const components = getComponents();
+            core.info("Installing rustup...");
             await installRustup();
-            await installToolchain();
-            const cacheKey = await getCacheKey(getToolchain());
+            core.info("Rustup installation completed.");
+            core.info("Installing toolchain...");
+            await installToolchain(toolchain, targets, components);
+            core.info("Toolchain installation completed.");
+            core.info("Generating cache key...");
+            const cacheKey = await generateCacheKey(toolchain);
+            core.info(`Cache key generated: ${cacheKey}`);
             core.setOutput("cacheKey", cacheKey);
+            core.info("Action completed successfully.");
         } catch (error) {
+            core.error("An error occurred during the setup-rust action.");
             if (error instanceof Error) core.setFailed(error.message);
             throw error;
         }
