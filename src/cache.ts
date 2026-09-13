@@ -20,7 +20,7 @@ export async function generateCacheKey(toolchain: string) {
     {
       hash: "",
       date: "",
-    }
+    },
   );
 
   return (date + hash).replaceAll("-", "").slice(0, 20);

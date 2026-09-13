@@ -1,7 +1,6 @@
-import fs from "fs/promises";
-import os from "os";
-import path from "path";
-
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as io from "@actions/io";
@@ -48,7 +47,7 @@ export async function installRustup() {
 export async function installToolchain(
   toolchain: string,
   targets: string[],
-  components: string[]
+  components: string[],
 ) {
   core.info(`Starting installation of toolchain: ${toolchain}`);
 

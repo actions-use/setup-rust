@@ -1,3 +1,3 @@
 export default {
-  "*.{js,mjs,cjs,ts}": "eslint . --fix",
+  "*.{js,mjs,cjs,ts}": "biome check --write",
 };

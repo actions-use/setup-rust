@@ -14,11 +14,12 @@ jobs:
     name: Test
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Rust
         uses: ./
         with:
           toolchain: nightly
           components: rustfmt, clippy
-      - run: rustup --version
-      - run: cargo --version
+      - run: |
+          rustup --version
+          cargo --version

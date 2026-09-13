@@ -5,9 +5,11 @@ export default defineConfig({
     {
       format: "cjs",
       syntax: "es2022",
-      autoExternal: {
-        dependencies: false,
-      },
     },
   ],
+  output: {
+    autoExternal: {
+      dependencies: false,
+    },
+  },
 });

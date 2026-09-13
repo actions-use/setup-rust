@@ -1,8 +1,7 @@
 import * as core from "@actions/core";
-
-import { installRustup, installToolchain } from "./install.ts";
-import { getToolchain, getComponents, getTargets } from "./input.ts";
 import { generateCacheKey } from "./cache.ts";
+import { getComponents, getTargets, getToolchain } from "./input.ts";
+import { installRustup, installToolchain } from "./install.ts";
 
 /**
  * The main function for the action.

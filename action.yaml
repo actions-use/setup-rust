@@ -25,5 +25,5 @@ outputs:
     description: A short hash of the rustc version, appropriate for use as a cache key. "202503154eb161250e34"
 
 runs:
-  using: node20
+  using: node24
   main: dist/index.cjs
